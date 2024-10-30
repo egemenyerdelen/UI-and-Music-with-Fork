@@ -5,7 +5,7 @@ public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance;
 
-    [Range(3, 10)]
+    [Range(2, 10)]
     [SerializeField] private int audioSourceCount;
     
     [SerializeField] private AudioSource[] audioSources;
@@ -47,7 +47,7 @@ public class AudioManager : MonoBehaviour
     }
     public void PlaySoundFX(string soundEffectName, int audioSourceIndex)
     {
-        var sound = Array.Find(musics, sound => sound.name == soundEffectName);
+        var sound = Array.Find(soundEffects, sound => sound.name == soundEffectName);
 
         audioSources[audioSourceIndex].clip = sound.audioClip;
         audioSources[audioSourceIndex].Play();
@@ -56,10 +56,24 @@ public class AudioManager : MonoBehaviour
     // This method creates temp gameObject then destroys it.
     public void PlaySoundEffectOnPoint(string soundEffectName, Transform objectTransform)
     {
-        var sound = Array.Find(musics, sound => sound.name == soundEffectName);
+        var sound = Array.Find(soundEffects, sound => sound.name == soundEffectName);
 
         var tempGameObject = Instantiate(tempAudioObject);
         tempGameObject.transform.position = objectTransform.position;
+        
+        var tempAudioSource = tempGameObject.GetComponent<AudioSource>();
+        tempAudioSource.clip = sound.audioClip;
+        // I can set other AudioSource properties from here
+        
+        tempAudioSource.Play();
+        Destroy(tempGameObject, sound.audioClip.length);
+    }
+    public void PlaySoundEffectOnPoint(string soundEffectName, Vector3 pointToPlay)
+    {
+        var sound = Array.Find(soundEffects, sound => sound.name == soundEffectName);
+
+        var tempGameObject = Instantiate(tempAudioObject);
+        tempGameObject.transform.position = pointToPlay;
         
         var tempAudioSource = tempGameObject.GetComponent<AudioSource>();
         tempAudioSource.clip = sound.audioClip;
