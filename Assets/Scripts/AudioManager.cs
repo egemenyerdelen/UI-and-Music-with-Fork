@@ -3,10 +3,17 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
-    #region Singleton
-
     public static AudioManager Instance;
-        
+
+    [Range(3, 10)]
+    [SerializeField] private int audioSourceCount;
+    
+    [SerializeField] private AudioSource[] audioSources;
+    [SerializeField] private Sound[] musics;
+    [SerializeField] private Sound[] soundEffects;
+
+    [SerializeField] private GameObject tempAudioObject;
+
     private void Awake()
     {
         if (Instance == null)
@@ -17,31 +24,47 @@ public class AudioManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-    }
-
-    #endregion
-    
-    [SerializeField] private AudioSource musicSource;
-    [SerializeField] private AudioSource sfxSource;
-    [SerializeField] private Sound[] musics;
-    [SerializeField] private Sound[] soundEffects;
-    private void Start()
-    {
         
+        CreateAndAssignAudioSources(audioSourceCount);
     }
 
-    private void PlayMusic(string musicName)
+    private void CreateAndAssignAudioSources(int number)
     {
-        var music = Array.Find(musics, sound => sound.name == musicName);
+        for (var i = 0; i < number; i++)
+        {
+            gameObject.AddComponent<AudioSource>();
+        }
 
-        musicSource.clip = music.audioClip;
-        musicSource.Play();
+        audioSources = GetComponents<AudioSource>();
     }
-
-    private void PlayMusicOnPoint(string musicName, Transform objectTransform)
+    public void PlayMusic(string musicName, int audioSourceIndex)
     {
         var music = Array.Find(musics, sound => sound.name == musicName);
+
+        audioSources[audioSourceIndex].clip = music.audioClip;
+        audioSources[audioSourceIndex].Play();
+    }
+    public void PlaySoundFX(string soundEffectName, int audioSourceIndex)
+    {
+        var sound = Array.Find(musics, sound => sound.name == soundEffectName);
+
+        audioSources[audioSourceIndex].clip = sound.audioClip;
+        audioSources[audioSourceIndex].Play();
+    }
+
+    // This method creates temp gameObject then destroys it.
+    public void PlaySoundEffectOnPoint(string soundEffectName, Transform objectTransform)
+    {
+        var sound = Array.Find(musics, sound => sound.name == soundEffectName);
+
+        var tempGameObject = Instantiate(tempAudioObject);
+        tempGameObject.transform.position = objectTransform.position;
         
+        var tempAudioSource = tempGameObject.GetComponent<AudioSource>();
+        tempAudioSource.clip = sound.audioClip;
+        // I can set other AudioSource properties from here
         
+        tempAudioSource.Play();
+        Destroy(tempGameObject, sound.audioClip.length);
     }
 }
