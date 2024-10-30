@@ -26,6 +26,7 @@ public class AudioManager : MonoBehaviour
         }
         
         CreateAndAssignAudioSources(audioSourceCount);
+        DontDestroyOnLoad(gameObject);
     }
 
     private void CreateAndAssignAudioSources(int number)
