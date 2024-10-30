@@ -4,9 +4,6 @@ using UnityEngine;
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance;
-
-    [Range(2, 10)]
-    [SerializeField] private int audioSourceCount;
     
     [SerializeField] private AudioSource[] audioSources;
     [SerializeField] private Sound[] musics;
@@ -19,25 +16,16 @@ public class AudioManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
         }
         
-        CreateAndAssignAudioSources(audioSourceCount);
-        DontDestroyOnLoad(gameObject);
-    }
-
-    private void CreateAndAssignAudioSources(int number)
-    {
-        for (var i = 0; i < number; i++)
-        {
-            gameObject.AddComponent<AudioSource>();
-        }
-
         audioSources = GetComponents<AudioSource>();
     }
+
     public void PlayMusic(string musicName, int audioSourceIndex)
     {
         var music = Array.Find(musics, sound => sound.name == musicName);
