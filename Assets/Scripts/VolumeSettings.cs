@@ -15,12 +15,13 @@ public class VolumeSettings : MonoBehaviour
     private const string MusicKey = "MusicVolume";
     private const string SfxKey = "SfxVolume";
 
-    private float _cachedMasterSliderValue;
-    private float _cachedMusicSliderValue;
-    private float _cachedSfxSliderValue;
+    private Dictionary<string, Slider> _keyAndSliderDictionary;
+    private Dictionary<Slider, float> _cachedSliderValues;
 
     private void Start()
     {
+        InitializeDictionaries();
+        
         SetAllValues(masterSlider.value, musicSlider.value, sfxSlider.value);
         
         masterSlider.onValueChanged.AddListener(SetMasterValue);
@@ -40,53 +41,47 @@ public class VolumeSettings : MonoBehaviour
 
     public void ToggleBox(string targetMixerKey)
     {
-        var keyAndSliderDictionary = new Dictionary<string, Slider>()
-        {
-            { "MasterVolume", masterSlider },
-            { "MusicVolume", musicSlider },
-            { "SfxVolume", sfxSlider }
-        };
-        // Assign current volume value of targetMixer to currentFloat for check if is muted or not
-        volumeMixer.GetFloat(targetMixerKey, out var currentFloat);
-        var targetSlider = keyAndSliderDictionary[targetMixerKey];
-
+        var targetSlider = _keyAndSliderDictionary[targetMixerKey];
+        
         // ReSharper disable once CompareOfFloatsByEqualityOperator
-        if (currentFloat != -80)
+        if (targetSlider.value != targetSlider.minValue)
         {
             // Mute
             CacheSliderValue(targetSlider);
-            volumeMixer.SetFloat(targetMixerKey, -80);
-            targetSlider.value = targetSlider.minValue;
+            targetSlider.value = targetSlider.minValue; 
         }
         else
         {
             // Unmute
             targetSlider.value = GetCachedSliderValue(targetSlider);
-            volumeMixer.SetFloat(targetMixerKey, Mathf.Log10(targetSlider.value) * 20);
         }
     }
 
+    private void InitializeDictionaries()
+    {
+        _keyAndSliderDictionary = new Dictionary<string, Slider>
+        {
+            { "MasterVolume", masterSlider },
+            { "MusicVolume", musicSlider },
+            { "SfxVolume", sfxSlider }
+        };
+        
+        _cachedSliderValues = new Dictionary<Slider, float>
+        {
+            { masterSlider, masterSlider.value },
+            { musicSlider, musicSlider.value },
+            { sfxSlider, sfxSlider.value }
+        };
+    }
+    
     private float GetCachedSliderValue(Slider slider)
     {
-        var sliderToTakeValue = new Dictionary<Slider, float>()
-        {
-            { masterSlider, _cachedMasterSliderValue },
-            { musicSlider, _cachedMusicSliderValue },
-            { sfxSlider , _cachedSfxSliderValue}
-        };
-        return sliderToTakeValue[slider];
+        return _cachedSliderValues[slider];
     }
     
     private void CacheSliderValue(Slider slider)
     {
-        var sliderToCache = new Dictionary<Slider, float>()
-        {
-            { masterSlider, _cachedMasterSliderValue },
-            { musicSlider, _cachedMusicSliderValue },
-            { sfxSlider , _cachedSfxSliderValue}
-        };
-
-        sliderToCache[slider] = slider.value;
+        _cachedSliderValues[slider] = slider.value;
     }
     
     private void SetAllValues(float masterValue, float musicValue, float sfxValue)
