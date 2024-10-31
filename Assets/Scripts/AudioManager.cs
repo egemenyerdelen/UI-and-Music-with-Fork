@@ -26,14 +26,14 @@ public class AudioManager : MonoBehaviour
         audioSources = GetComponents<AudioSource>();
     }
 
-    public void PlayMusic(string musicName, int audioSourceIndex)
+    public void PlayMusic(string musicName, int audioSourceIndex = 0)
     {
         var music = Array.Find(musics, sound => sound.name == musicName);
 
         audioSources[audioSourceIndex].clip = music.audioClip;
         audioSources[audioSourceIndex].Play();
     }
-    public void PlaySoundFX(string soundEffectName, int audioSourceIndex)
+    public void PlaySoundFX(string soundEffectName, int audioSourceIndex = 1)
     {
         var sound = Array.Find(soundEffects, sound => sound.name == soundEffectName);
 
