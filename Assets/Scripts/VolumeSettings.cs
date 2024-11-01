@@ -39,7 +39,7 @@ public class VolumeSettings : MonoBehaviour
         AudioManager.Instance.PlaySoundFX("Effect_2");
     }
 
-    public void ToggleBox(string targetMixerKey)
+    public void MuteButton(string targetMixerKey)
     {
         var targetSlider = _keyAndSliderDictionary[targetMixerKey];
         
